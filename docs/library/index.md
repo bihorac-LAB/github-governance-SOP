@@ -24,91 +24,61 @@ For published research with code/data
 
 ## 🔄 Pull Request Templates
 
-### [Standard PR Template](pull-request-template.md)
+### [Standard PR Template](pull-requests/standard-pr.md)
 For most code and documentation changes
 - Change summary and testing checklist
 - Data safety verification and review requests
 
-### [Data Addition Template](pull-request-data.md)
+### [Data Addition Template](pull-requests/data-addition-pr.md)
 When adding datasets or data processing code
 - Data classification verification and source documentation
 - Processing steps and safety checklist
 
-### [Publication Template](pull-request-publication.md)
+### [Publication Template](pull-requests/publication-pr.md)
 For adding published research materials
 - Paper information and reproducibility verification
 - License compliance and citation requirements
 
 ## 📋 Issue Templates
 
-### [Bug Report](issue-bug.md)
+### [Bug Report](issues/bug-report.md)
 Report problems and errors
 - Steps to reproduce and environment details
 - Expected vs actual behavior with screenshots
 
-### [Feature Request](issue-feature.md)
+### [Feature Request](issues/feature-request.md)
 Suggest improvements and new features
 - Problem description and proposed solutions
 - Alternative approaches and additional context
 
-### [Data Access Request](issue-data.md)
+### [Data Access Request](issues/data-request.md)
 Request access to restricted datasets
 - Research purpose and data requirements
 - Security clearance and timeline needs
 
 ## 🗂️ Repository Files
 
-### [Contributing Guidelines](CONTRIBUTING.md)
+### [Contributing Guidelines](repository-files/contributing.md)
 Help others contribute to your project
 - Development workflow and code standards
 - Review process and communication guidelines
 
-### [Code of Conduct](CODE_OF_CONDUCT.md)
-Set community standards
-- Expected behavior and reporting procedures
-- Enforcement policies and contact information
-
-### [.gitignore Templates](gitignore-templates.md)
-Exclude unnecessary files from version control
-- Python, R, and data science workflows
-- Operating system and editor files
-
-## 📜 License Templates
-
-### [MIT License](LICENSE-MIT.txt)
-Permissive open source license
-
-### [Apache 2.0 License](LICENSE-Apache.txt) 
-Open source with patent protection
-
-### [Creative Commons](LICENSE-CC.md)
-For documentation and educational content
-
-### [Proprietary License](LICENSE-Proprietary.md)
-For internal organizational use
-
-## 🔒 Compliance Templates
-
-### [Data Classification Worksheet](data-classification.md)
-Classify your data before uploading
-- Decision flowchart and risk assessment
-- Documentation requirements and approval process
-
-### [Security Review Checklist](security-checklist.md)
-Before making repositories public
-- Access control and content verification
-- License compliance and data safety confirmation
-
 ## 🚀 GitHub Actions Templates
 
-### [Documentation Deployment](workflows/deploy-docs.yml)
-Automatically deploy MkDocs sites to GitHub Pages
+### [Governance Scanner](workflows/governance-scanner.yml)
+Automated compliance monitoring and security scanning
+- PHI/PII detection, secrets scanning, dependency checks
+- Daily access rights reviews and reporting
 
-### [Code Quality Checks](workflows/code-quality.yml)
-Run linting, testing, and security scans
+### [Organization Deployment](workflows/organization-deployment.yml)
+Enterprise-grade organization-wide governance deployment
+- Matrix strategy for parallel deployment to all repos
+- Automated compliance collection and executive dashboards
 
-### [Security Scanning](workflows/security-scan.yml)
-Detect secrets and vulnerabilities
+### [Repository Compliance Monitor](workflows/repository-compliance.yml)
+Individual repository compliance monitoring
+- Access review, data classification monitoring
+- Customizable compliance thresholds
 
 ## 🎯 How to Use These Templates
 
