@@ -1,0 +1,120 @@
+site_name: GitHub Governance & Training
+site_description: Public governance, SOP, and training portal for our GitHub organization
+site_author: Your Organization
+repo_name: your-org/github-governance
+repo_url: https://github.com/your-org/github-governance
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.top
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - content.code.annotate
+    - search.highlight
+    - search.suggest
+    - toc.follow
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: teal
+
+nav:
+  - Home: index.md
+  - Onboarding:
+      - "Start Here": onboarding/index.md
+      - "Onboarding Quiz": onboarding/quiz.md
+  - SOP:
+      - "How to Use This Document": sop/00_how_to_use.md
+      - "Purpose, Scope & Principles": sop/01_purpose_scope_principles.md
+      - "GitHub Fundamentals": sop/02_fundamentals.md
+      - "Access & Onboarding": sop/03_access_onboarding.md
+      - "Roles & Responsibilities": sop/04_roles_responsibilities.md
+      - "Data Classification & Policy": sop/05_data_policy.md
+      - "Repository Governance": sop/06_repo_governance.md
+      - "Standard Usage Workflows": sop/07_usage_workflows.md
+      - "Branching, PRs & Commits": sop/08_branching_pr_commit.md
+      - "Automation (Robots)": sop/09_automation_robots.md
+      - "Security & Compliance": sop/10_security_compliance.md
+      - "Review & Audit": sop/11_review_audit.md
+      - "Incident Response": sop/12_incident_response.md
+      - "Appendix: Use Cases": sop/13_appendix_use_cases.md
+      - "Full Manual (Single Page)": sop/master_manual.md
+  - Training:
+      - Overview: training/index.md
+  - Automation (Robots):
+      - Overview: automation/index.md
+  - Workflows:
+      - Overview: workflows/index.md
+  - Templates:
+      - Overview: templates/index.md
+  - FAQ & Resources:
+      - FAQ: faq/index.md
+      - Learning Resources: faq/resources.md
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - footnotes
+  - def_list
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/your-org
+  analytics:
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >-
+            Thanks for your feedback! Please help us improve by 
+            <a href="https://github.com/your-org/github-governance/issues/new" target="_blank" rel="noopener">
+            opening an issue
+            </a>.
+
+plugins:
+  - search:
+      lang: en
+  - git-revision-date-localized:
+      type: date
