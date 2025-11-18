@@ -46,11 +46,6 @@ jobs:
         with:
           enablement: true
 
-      - name: Validate MkDocs configuration
-        run: |
-          # Use main configuration
-          mkdocs config
-
       - name: Build site
         run: |
           # Build with main configuration

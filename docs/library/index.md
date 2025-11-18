@@ -137,6 +137,28 @@ Common placeholders you'll need to replace:
 - `[Repository URL]` - GitHub repository URL
 - `[License Type]` - Choose appropriate license
 
+## ⚙️ GitHub Actions Workflows
+
+### Governance Automation
+**Purpose**: Automated compliance monitoring and security scanning for your repositories
+
+**Available Workflows**:
+- **[Governance Scanner](workflows/governance-scanner.yml)** - PHI/PII detection, secrets scanning, dependency checks
+- **[Repository Compliance Monitor](workflows/repository-compliance.yml)** - Access review, data classification monitoring
+- **[Setup Guide](workflows/README.md)** - Complete deployment instructions and customization options
+
+**Quick Start**:
+1. Copy workflow files to `.github/workflows/` in your repository
+2. Create `DATA_CLASSIFICATION.md` using our [template](data-classification-template.md)
+3. Push changes to activate governance scanning
+
+**Features**:
+- Automated security and compliance monitoring
+- Daily access rights reviews
+- PHI/PII detection and alerts
+- Customizable compliance thresholds
+- Integration with organizational policies
+
 ## 💡 Template Tips
 
 ### Keep Templates Updated

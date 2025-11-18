@@ -1,0 +1,306 @@
+# Repository Governance Scanner
+# 
+# This workflow performs comprehensive governance checks on repositories
+# Copy this file to .github/workflows/ in your repository to enable governance scanning
+#
+# Required setup:
+# 1. Create DATA_CLASSIFICATION.md file in repository root
+# 2. Optional: Add SNYK_TOKEN secret for dependency scanning
+
+name: Repository Governance Scanner
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run weekly on Sundays at 2 AM
+    - cron: '0 2 * * 0'
+
+jobs:
+  phi-pii-scan:
+    name: PHI/PII Detection Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install detection tools
+        run: |
+          pip install presidio-analyzer presidio-anonymizer
+          pip install spacy
+          python -m spacy download en_core_web_sm
+
+      - name: Run PHI/PII Detection
+        id: phi-scan
+        run: |
+          python << 'EOF'
+          import os
+          import re
+          import sys
+          from presidio_analyzer import AnalyzerEngine
+          
+          # Common PHI/PII patterns
+          patterns = {
+              'SSN': r'\b\d{3}-\d{2}-\d{4}\b|\b\d{9}\b',
+              'Phone': r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b',
+              'Email': r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
+              'Credit_Card': r'\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b',
+              'Medical_Record': r'\b(MRN|mrn|medical.record)\s*:?\s*\d+',
+              'Date_of_Birth': r'\b(DOB|dob|born|birth.date)\s*:?\s*\d{1,2}[/-]\d{1,2}[/-]\d{2,4}'
+          }
+          
+          violations = []
+          analyzer = AnalyzerEngine()
+          
+          for root, dirs, files in os.walk('.'):
+              # Skip .git and other hidden directories
+              dirs[:] = [d for d in dirs if not d.startswith('.')]
+              
+              for file in files:
+                  if file.endswith(('.md', '.txt', '.py', '.js', '.json', '.csv', '.sql')):
+                      filepath = os.path.join(root, file)
+                      try:
+                          with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                              content = f.read()
+                              
+                              # Check regex patterns
+                              for pattern_name, pattern in patterns.items():
+                                  matches = re.finditer(pattern, content, re.IGNORECASE)
+                                  for match in matches:
+                                      violations.append({
+                                          'file': filepath,
+                                          'line': content[:match.start()].count('\n') + 1,
+                                          'type': pattern_name,
+                                          'text': match.group()
+                                      })
+                              
+                              # Use Presidio for advanced detection
+                              try:
+                                  results = analyzer.analyze(text=content, 
+                                                           entities=["PERSON", "PHONE_NUMBER", "EMAIL_ADDRESS", 
+                                                                   "CREDIT_CARD", "US_SSN", "MEDICAL_LICENSE"],
+                                                           language='en')
+                                  for result in results:
+                                      if result.score > 0.7:  # High confidence only
+                                          violated_text = content[result.start:result.end]
+                                          violations.append({
+                                              'file': filepath,
+                                              'line': content[:result.start].count('\n') + 1,
+                                              'type': result.entity_type,
+                                              'text': violated_text,
+                                              'confidence': result.score
+                                          })
+                              except:
+                                  # Continue if Presidio fails
+                                  pass
+                                  
+                      except Exception as e:
+                          print(f"Error scanning {filepath}: {e}")
+          
+          if violations:
+              print("🚨 POTENTIAL PHI/PII DETECTED:")
+              for v in violations:
+                  print(f"  📁 {v['file']}:{v.get('line', '?')} - {v['type']}: {v['text'][:50]}...")
+              sys.exit(1)
+          else:
+              print("✅ No PHI/PII detected")
+          EOF
+
+  secrets-scan:
+    name: Secrets Detection Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run TruffleHog OSS
+        uses: trufflesecurity/trufflehog@v3.63.2
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  dependency-scan:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+        continue-on-error: true
+
+  repository-structure-check:
+    name: Repository Structure Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Required Files
+        run: |
+          echo "🔍 Checking repository structure..."
+          
+          # Required files check
+          required_files=("README.md" "DATA_CLASSIFICATION.md")
+          missing_files=()
+          
+          for file in "${required_files[@]}"; do
+              if [[ ! -f "$file" ]]; then
+                  missing_files+=("$file")
+              fi
+          done
+          
+          if [[ ${#missing_files[@]} -gt 0 ]]; then
+              echo "❌ Missing required files:"
+              printf '  - %s\n' "${missing_files[@]}"
+              exit 1
+          fi
+          
+          echo "✅ All required files present"
+
+      - name: Validate Data Classification
+        run: |
+          echo "🔍 Validating data classification..."
+          
+          if [[ ! -f "DATA_CLASSIFICATION.md" ]]; then
+              echo "❌ DATA_CLASSIFICATION.md is required"
+              exit 1
+          fi
+          
+          # Check for completed classification
+          if grep -q "REPLACE_ME\|TODO\|TBD\|________________" DATA_CLASSIFICATION.md; then
+              echo "❌ DATA_CLASSIFICATION.md contains placeholder values"
+              echo "Please complete the data classification assessment"
+              exit 1
+          fi
+          
+          # Check for required sections
+          required_sections=("Data Classification Assessment" "Risk Assessment" "Approval Process")
+          for section in "${required_sections[@]}"; do
+              if ! grep -q "$section" DATA_CLASSIFICATION.md; then
+                  echo "❌ Missing required section: $section"
+                  exit 1
+              fi
+          done
+          
+          echo "✅ Data classification appears complete"
+
+      - name: Check File Size Limits
+        run: |
+          echo "🔍 Checking for large files..."
+          
+          # Find files larger than 100MB
+          large_files=$(find . -type f -size +100M 2>/dev/null | grep -v '\.git/' || true)
+          
+          if [[ -n "$large_files" ]]; then
+              echo "❌ Large files detected (>100MB):"
+              echo "$large_files"
+              echo "Consider using Git LFS or external storage"
+              exit 1
+          fi
+          
+          # Find files larger than 10MB but smaller than 100MB
+          medium_files=$(find . -type f -size +10M -size -100M 2>/dev/null | grep -v '\.git/' || true)
+          
+          if [[ -n "$medium_files" ]]; then
+              echo "⚠️  Medium files detected (>10MB):"
+              echo "$medium_files"
+              echo "Consider if these files are appropriate for Git storage"
+          fi
+          
+          echo "✅ File size check complete"
+
+  license-compliance:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check License Compatibility
+        run: |
+          echo "🔍 Checking license compliance..."
+          
+          # This is a basic example - customize for your organization's needs
+          if [[ -f "package.json" ]]; then
+              # For Node.js projects
+              if command -v npm &> /dev/null; then
+                  echo "Checking npm dependencies..."
+                  npm install --package-lock-only
+                  
+                  # Check for GPL licenses in dependencies (example restriction)
+                  if npm ls --json | jq -r '.. | .license? // empty' | grep -i gpl; then
+                      echo "⚠️  GPL-licensed dependencies detected"
+                      echo "Review license compatibility with your organization's policy"
+                  fi
+              fi
+          fi
+          
+          echo "✅ License compliance check complete"
+
+  governance-summary:
+    name: Governance Scan Summary
+    runs-on: ubuntu-latest
+    needs: [phi-pii-scan, secrets-scan, repository-structure-check]
+    if: always()
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## 📊 Repository Governance Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check job results
+          phi_result="${{ needs.phi-pii-scan.result }}"
+          secrets_result="${{ needs.secrets-scan.result }}"
+          structure_result="${{ needs.repository-structure-check.result }}"
+          
+          echo "| Check | Status | Notes |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          
+          # PHI/PII scan
+          if [[ "$phi_result" == "success" ]]; then
+              echo "| PHI/PII Detection | ✅ Passed | No sensitive data detected |" >> $GITHUB_STEP_SUMMARY
+          else
+              echo "| PHI/PII Detection | ❌ Failed | Potential sensitive data found |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Secrets scan
+          if [[ "$secrets_result" == "success" ]]; then
+              echo "| Secrets Detection | ✅ Passed | No secrets detected |" >> $GITHUB_STEP_SUMMARY
+          else
+              echo "| Secrets Detection | ❌ Failed | Potential secrets found |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Structure check
+          if [[ "$structure_result" == "success" ]]; then
+              echo "| Repository Structure | ✅ Passed | All required files present |" >> $GITHUB_STEP_SUMMARY
+          else
+              echo "| Repository Structure | ❌ Failed | Missing required files or invalid structure |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📚 Resources" >> $GITHUB_STEP_SUMMARY
+          echo "- [GitHub Governance Guide](https://your-org.github.io/github-governance-SOP/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Data Safety Rules](https://your-org.github.io/github-governance-SOP/rules/data-safety/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Security Requirements](https://your-org.github.io/github-governance-SOP/rules/security/)" >> $GITHUB_STEP_SUMMARY
+          
+          # Fail the workflow if any critical checks failed
+          if [[ "$phi_result" != "success" || "$secrets_result" != "success" ]]; then
+              echo "❌ Critical governance violations detected"
+              exit 1
+          fi

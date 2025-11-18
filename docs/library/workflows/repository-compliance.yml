@@ -1,0 +1,374 @@
+# Repository Compliance Monitor
+#
+# This workflow performs ongoing compliance monitoring for repositories
+# Copy this file to .github/workflows/ in your repository to enable compliance monitoring
+#
+# Features:
+# - Daily automated access review
+# - Data classification currency checks  
+# - Security posture monitoring
+# - Automated issue creation for violations
+
+name: Repository Compliance Monitor
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      scan_type:
+        description: 'Type of compliance scan to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - access-review
+          - data-classification
+          - security-scan
+
+jobs:
+  access-review:
+    name: Access Rights Review
+    runs-on: ubuntu-latest
+    if: github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == 'access-review' || github.event_name == 'schedule'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Review Repository Access
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Get repository collaborators
+            const { data: collaborators } = await github.rest.repos.listCollaborators({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            // Get organization teams with access
+            const { data: teams } = await github.rest.repos.listTeams({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            console.log('📊 Repository Access Review:');
+            console.log(`Total collaborators: ${collaborators.length}`);
+            console.log(`Total teams: ${teams.length}`);
+            
+            // Check for external collaborators
+            const externalCollaborators = collaborators.filter(c => !c.site_admin);
+            if (externalCollaborators.length > 0) {
+              console.log('\n⚠️  External collaborators detected:');
+              externalCollaborators.forEach(c => {
+                console.log(`  - ${c.login} (${c.permissions?.admin ? 'admin' : c.permissions?.push ? 'write' : 'read'})`);
+              });
+            }
+            
+            // Check for admin access
+            const adminUsers = collaborators.filter(c => c.permissions?.admin);
+            if (adminUsers.length > 3) {
+              console.log(`\n⚠️  High number of admin users: ${adminUsers.length}`);
+              console.log('Consider reviewing admin access necessity');
+            }
+            
+            // Generate access report
+            const accessReport = {
+              timestamp: new Date().toISOString(),
+              repository: `${context.repo.owner}/${context.repo.repo}`,
+              collaborators: collaborators.length,
+              teams: teams.length,
+              external_collaborators: externalCollaborators.length,
+              admin_users: adminUsers.length
+            };
+            
+            // Create or update access log
+            try {
+              const logPath = '.github/access-review-log.json';
+              let existingLog = [];
+              
+              try {
+                const { data: logFile } = await github.rest.repos.getContent({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: logPath,
+                });
+                existingLog = JSON.parse(Buffer.from(logFile.content, 'base64').toString());
+              } catch (e) {
+                // File doesn't exist, will create new
+              }
+              
+              existingLog.push(accessReport);
+              
+              // Keep only last 30 entries
+              if (existingLog.length > 30) {
+                existingLog = existingLog.slice(-30);
+              }
+              
+              const updatedContent = Buffer.from(JSON.stringify(existingLog, null, 2)).toString('base64');
+              
+              if (existingLog.length === 1) {
+                // Create new file
+                await github.rest.repos.createOrUpdateFileContents({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: logPath,
+                  message: 'Add access review log',
+                  content: updatedContent,
+                });
+              } else {
+                // Update existing file
+                const { data: currentFile } = await github.rest.repos.getContent({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: logPath,
+                });
+                
+                await github.rest.repos.createOrUpdateFileContents({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: logPath,
+                  message: 'Update access review log',
+                  content: updatedContent,
+                  sha: currentFile.sha,
+                });
+              }
+            } catch (error) {
+              console.log('Warning: Could not update access log:', error.message);
+            }
+
+  data-classification-review:
+    name: Data Classification Review
+    runs-on: ubuntu-latest
+    if: github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == 'data-classification' || github.event_name == 'schedule'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Review Data Classification Currency
+        run: |
+          echo "🔍 Reviewing data classification currency..."
+          
+          if [[ ! -f "DATA_CLASSIFICATION.md" ]]; then
+              echo "❌ DATA_CLASSIFICATION.md not found"
+              echo "::error::Repository missing required data classification"
+              exit 1
+          fi
+          
+          # Check last modification date
+          last_modified=$(git log -1 --format="%cd" --date=short -- DATA_CLASSIFICATION.md 2>/dev/null || echo "unknown")
+          echo "Last classification update: $last_modified"
+          
+          # Calculate days since last update
+          if [[ "$last_modified" != "unknown" ]]; then
+              current_date=$(date +%Y-%m-%d)
+              days_diff=$(( ($(date -d "$current_date" +%s) - $(date -d "$last_modified" +%s)) / 86400 ))
+              
+              if [[ $days_diff -gt 365 ]]; then
+                  echo "⚠️  Data classification is over 1 year old ($days_diff days)"
+                  echo "::warning::Data classification may need review"
+              elif [[ $days_diff -gt 180 ]]; then
+                  echo "ℹ️  Data classification is $days_diff days old"
+                  echo "Consider reviewing for accuracy"
+              else
+                  echo "✅ Data classification is current ($days_diff days old)"
+              fi
+          fi
+          
+          # Check for required review date
+          if grep -q "Next Review Date:" DATA_CLASSIFICATION.md; then
+              review_date=$(grep "Next Review Date:" DATA_CLASSIFICATION.md | head -1 | sed 's/.*Next Review Date:[[:space:]]*//' | tr -d '`')
+              echo "Scheduled review date: $review_date"
+              
+              if [[ -n "$review_date" && "$review_date" != "_______" ]]; then
+                  current_epoch=$(date +%s)
+                  review_epoch=$(date -d "$review_date" +%s 2>/dev/null || echo "0")
+                  
+                  if [[ $review_epoch -lt $current_epoch ]]; then
+                      echo "⚠️  Scheduled review date has passed"
+                      echo "::warning::Data classification review is overdue"
+                  fi
+              fi
+          fi
+
+  security-posture-check:
+    name: Security Posture Check
+    runs-on: ubuntu-latest
+    if: github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == 'security-scan' || github.event_name == 'schedule'
+    steps:
+      - name: Check Repository Security Settings
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('🔒 Checking repository security settings...');
+            
+            // Get repository details
+            const { data: repo } = await github.rest.repos.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            const issues = [];
+            
+            // Check visibility
+            if (repo.private === false) {
+              console.log('📖 Repository is public');
+              // Additional checks for public repos
+              if (!repo.has_issues) {
+                console.log('ℹ️  Issues are disabled for public repo');
+              }
+            } else {
+              console.log('🔒 Repository is private');
+            }
+            
+            // Check branch protection
+            try {
+              const { data: protection } = await github.rest.repos.getBranchProtection({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                branch: repo.default_branch,
+              });
+              
+              console.log('✅ Branch protection enabled');
+              
+              if (!protection.required_pull_request_reviews) {
+                issues.push('Branch protection lacks required PR reviews');
+              }
+              
+              if (!protection.enforce_admins.enabled) {
+                issues.push('Branch protection does not enforce restrictions for admins');
+              }
+              
+            } catch (error) {
+              if (error.status === 404) {
+                issues.push('No branch protection configured for default branch');
+              }
+            }
+            
+            // Check security features
+            const securityFeatures = {
+              'Vulnerability alerts': repo.vulnerability_alerts_enabled,
+              'Security advisories': repo.security_and_analysis?.secret_scanning?.status === 'enabled',
+              'Secret scanning': repo.security_and_analysis?.secret_scanning_push_protection?.status === 'enabled',
+              'Dependency graph': repo.security_and_analysis?.dependency_graph?.status === 'enabled'
+            };
+            
+            console.log('\n🛡️  Security Features Status:');
+            for (const [feature, enabled] of Object.entries(securityFeatures)) {
+              const status = enabled ? '✅' : '❌';
+              console.log(`  ${status} ${feature}`);
+              if (!enabled) {
+                issues.push(`${feature} is not enabled`);
+              }
+            }
+            
+            // Summary
+            if (issues.length > 0) {
+              console.log('\n⚠️  Security Issues Found:');
+              issues.forEach(issue => console.log(`  - ${issue}`));
+              
+              // Create issue if none exists
+              try {
+                const { data: existingIssues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'open',
+                  labels: 'security,governance'
+                });
+                
+                if (existingIssues.length === 0) {
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: '🛡️ Repository Security Configuration Review Needed',
+                    body: `## Security Configuration Issues\n\nThe automated security review found the following issues:\n\n${issues.map(i => `- ${i}`).join('\n')}\n\n### Recommended Actions\n\n1. Review and enable missing security features\n2. Configure branch protection rules\n3. Ensure compliance with organization security policies\n\n### Resources\n\n- [GitHub Governance Guide](https://your-org.github.io/github-governance-SOP/)\n- [Security Requirements](https://your-org.github.io/github-governance-SOP/rules/security/)\n- [Repository Setup Guide](https://your-org.github.io/github-governance-SOP/guides/create-repository/)\n\n---\n\n*This issue was created automatically by the compliance monitor. Please address these items and close this issue when complete.*`,
+                    labels: ['security', 'governance', 'automated']
+                  });
+                  console.log('📝 Created security review issue');
+                }
+              } catch (error) {
+                console.log('Could not create issue:', error.message);
+              }
+              
+            } else {
+              console.log('\n✅ No security issues found');
+            }
+
+  compliance-report:
+    name: Generate Compliance Report
+    runs-on: ubuntu-latest
+    needs: [access-review, data-classification-review, security-posture-check]
+    if: always()
+    steps:
+      - name: Generate Summary Report
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const report = {
+              timestamp: new Date().toISOString(),
+              repository: `${context.repo.owner}/${context.repo.repo}`,
+              workflow_run: context.runId,
+              checks: {
+                access_review: '${{ needs.access-review.result }}',
+                data_classification: '${{ needs.data-classification-review.result }}',
+                security_posture: '${{ needs.security-posture-check.result }}'
+              }
+            };
+            
+            console.log('📊 Compliance Report Summary:');
+            console.log(JSON.stringify(report, null, 2));
+            
+            // Determine overall compliance status
+            const failedChecks = Object.entries(report.checks)
+              .filter(([check, result]) => result === 'failure')
+              .map(([check]) => check);
+            
+            if (failedChecks.length > 0) {
+              console.log(`\n❌ Compliance issues in: ${failedChecks.join(', ')}`);
+              core.setFailed(`Compliance violations detected: ${failedChecks.join(', ')}`);
+            } else {
+              console.log('\n✅ Repository is compliant with governance policies');
+            }
+
+      - name: Post to Summary
+        run: |
+          echo "# 📊 Repository Compliance Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Scan Date:** $(date -u +%Y-%m-%d\ %H:%M\ UTC)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "## Compliance Checks" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status | Notes |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          
+          # Access Review
+          if [[ "${{ needs.access-review.result }}" == "success" ]]; then
+            echo "| Access Rights Review | ✅ Passed | Repository access is appropriate |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Access Rights Review | ❌ Failed | Issues with repository access detected |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Data Classification
+          if [[ "${{ needs.data-classification-review.result }}" == "success" ]]; then
+            echo "| Data Classification | ✅ Passed | Classification is current and complete |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Data Classification | ❌ Failed | Classification needs review or update |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Security Posture
+          if [[ "${{ needs.security-posture-check.result }}" == "success" ]]; then
+            echo "| Security Configuration | ✅ Passed | Security settings are properly configured |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Security Configuration | ❌ Failed | Security configuration issues detected |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Review any failed checks above" >> $GITHUB_STEP_SUMMARY
+          echo "- Address security or compliance issues" >> $GITHUB_STEP_SUMMARY
+          echo "- Update data classification if needed" >> $GITHUB_STEP_SUMMARY
+          echo "- Review repository access permissions" >> $GITHUB_STEP_SUMMARY
