@@ -128,7 +128,7 @@ flowchart TD
 - **Contact GitHub Tech Managers** for policy questions
 
 ### Quick Contacts
-- **GitHub Tech Managers**: [GitHub Tech Managers](contact.md)
+- **GitHub Tech Managers**: [GitHub Tech Managers](../help/contact.md)
 - **Topics**: Policies, access, security, GitHub Actions, routine checks  
 - **Administration/Billing**: [Administration team](../help/contact.md)
 - **Response time**: 1-2 business days

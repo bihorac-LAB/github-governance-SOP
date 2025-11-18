@@ -85,7 +85,7 @@ All users must follow these security rules to protect our organization and data.
 ### If You Suspect a Security Issue
 1. **Don't panic** - but act quickly
 2. **Change passwords immediately** - especially if account may be compromised
-3. **Contact GitHub Tech Managers** - [GitHub Tech Managers](contact.md)
+3. **Contact GitHub Tech Managers** - [GitHub Tech Managers](../help/contact.md)
 4. **Document what happened** - timeline, what you observed, actions taken
 5. **Preserve evidence** - don't delete logs or try to "fix" things yourself
 
@@ -96,7 +96,7 @@ All users must follow these security rules to protect our organization and data.
 4. **Follow incident procedures** - let Tech Managers handle proper cleanup
 
 ### Emergency Contacts
-- **GitHub Tech Managers**: [GitHub Tech Managers](contact.md)
+- **GitHub Tech Managers**: [GitHub Tech Managers](../help/contact.md)
 - **Administration/Billing**: [Administration team](../help/contact.md)
 - **Response time**: 1-2 business days for technical/policy issues
 - **Business hours**: Monday-Friday, 8am-5pm for admin issues

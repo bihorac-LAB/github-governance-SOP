@@ -1,0 +1,502 @@
+# Organization-Wide Governance Deployment
+#
+# This workflow deploys governance workflows to all repositories in the organization
+# and collects compliance reports for centralized monitoring
+#
+# Setup:
+# 1. Create this workflow in a central "governance" repository
+# 2. Configure organization permissions for repository access
+# 3. Set up data collection and reporting endpoints
+
+name: Organization Governance Deployment
+
+on:
+  schedule:
+    # Run weekly on Sundays to deploy updates
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - deploy-workflows
+          - collect-reports
+          - full-audit
+      dry_run:
+        description: 'Dry run mode (no actual changes)'
+        required: false
+        type: boolean
+        default: true
+
+env:
+  GOVERNANCE_VERSION: "v1.2.0"
+  ORG_NAME: "your-org"
+
+jobs:
+  get-repositories:
+    name: Discover Repositories
+    runs-on: ubuntu-latest
+    outputs:
+      repositories: ${{ steps.get-repos.outputs.repositories }}
+      total_repos: ${{ steps.get-repos.outputs.total }}
+    steps:
+      - name: Get Organization Repositories
+        id: get-repos
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('🔍 Discovering repositories in organization...');
+            
+            const repos = [];
+            let page = 1;
+            let hasMore = true;
+            
+            while (hasMore) {
+              const response = await github.rest.repos.listForOrg({
+                org: process.env.ORG_NAME,
+                type: 'all',
+                sort: 'updated',
+                per_page: 100,
+                page: page
+              });
+              
+              repos.push(...response.data);
+              hasMore = response.data.length === 100;
+              page++;
+            }
+            
+            // Filter repositories that need governance
+            const targetRepos = repos.filter(repo => {
+              // Skip archived repositories
+              if (repo.archived) return false;
+              
+              // Skip governance repository itself
+              if (repo.name === 'github-governance-SOP') return false;
+              
+              // Skip forked repositories (optional)
+              if (repo.fork) return false;
+              
+              // Include only repositories with recent activity
+              const lastUpdate = new Date(repo.updated_at);
+              const monthsOld = (Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+              return monthsOld < 6; // Only repos updated in last 6 months
+            });
+            
+            console.log(`Found ${repos.length} total repositories`);
+            console.log(`Targeting ${targetRepos.length} repositories for governance`);
+            
+            core.setOutput('repositories', JSON.stringify(targetRepos.map(r => r.name)));
+            core.setOutput('total', targetRepos.length);
+            
+            return targetRepos.map(r => ({
+              name: r.name,
+              private: r.private,
+              language: r.language,
+              size: r.size
+            }));
+
+  deploy-workflows:
+    name: Deploy Governance Workflows
+    runs-on: ubuntu-latest
+    needs: get-repositories
+    if: github.event.inputs.action == 'deploy-workflows' || github.event.inputs.action == 'full-audit' || github.event_name == 'schedule'
+    strategy:
+      matrix:
+        repository: ${{ fromJson(needs.get-repositories.outputs.repositories) }}
+      max-parallel: 5  # Don't overwhelm the API
+      fail-fast: false
+    steps:
+      - name: Checkout governance repository
+        uses: actions/checkout@v4
+
+      - name: Check repository governance status
+        id: check-status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repo = '${{ matrix.repository }}';
+            console.log(`🔍 Checking governance status for ${repo}...`);
+            
+            try {
+              // Check if governance workflow exists
+              const { data: workflows } = await github.rest.actions.listRepoWorkflows({
+                owner: process.env.ORG_NAME,
+                repo: repo
+              });
+              
+              const hasGovernance = workflows.workflows.some(w => 
+                w.name.includes('Governance') || w.name.includes('Compliance')
+              );
+              
+              // Check if DATA_CLASSIFICATION.md exists
+              let hasClassification = false;
+              try {
+                await github.rest.repos.getContent({
+                  owner: process.env.ORG_NAME,
+                  repo: repo,
+                  path: 'DATA_CLASSIFICATION.md'
+                });
+                hasClassification = true;
+              } catch (e) {
+                // File doesn't exist
+              }
+              
+              console.log(`Repository ${repo}:`);
+              console.log(`  - Has governance workflow: ${hasGovernance}`);
+              console.log(`  - Has data classification: ${hasClassification}`);
+              
+              core.setOutput('has_governance', hasGovernance);
+              core.setOutput('has_classification', hasClassification);
+              core.setOutput('needs_deployment', !hasGovernance || !hasClassification);
+              
+            } catch (error) {
+              console.log(`Error checking ${repo}: ${error.message}`);
+              core.setOutput('needs_deployment', false);
+            }
+
+      - name: Deploy governance workflow
+        if: steps.check-status.outputs.needs_deployment == 'true' && github.event.inputs.dry_run != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repo = '${{ matrix.repository }}';
+            const fs = require('fs');
+            
+            console.log(`🚀 Deploying governance to ${repo}...`);
+            
+            try {
+              // Read governance workflow template
+              const workflowContent = fs.readFileSync('docs/library/workflows/governance-scanner.yml', 'utf8');
+              const workflowBase64 = Buffer.from(workflowContent).toString('base64');
+              
+              // Deploy governance workflow
+              await github.rest.repos.createOrUpdateFileContents({
+                owner: process.env.ORG_NAME,
+                repo: repo,
+                path: '.github/workflows/governance-scanner.yml',
+                message: `Add governance workflow ${process.env.GOVERNANCE_VERSION}`,
+                content: workflowBase64
+              });
+              
+              // Deploy DATA_CLASSIFICATION.md if missing
+              if ('${{ steps.check-status.outputs.has_classification }}' === 'false') {
+                const classificationContent = fs.readFileSync('docs/library/data-classification-template.md', 'utf8');
+                const classificationBase64 = Buffer.from(classificationContent).toString('base64');
+                
+                await github.rest.repos.createOrUpdateFileContents({
+                  owner: process.env.ORG_NAME,
+                  repo: repo,
+                  path: 'DATA_CLASSIFICATION.md',
+                  message: 'Add data classification template',
+                  content: classificationBase64
+                });
+              }
+              
+              console.log(`✅ Successfully deployed governance to ${repo}`);
+              
+            } catch (error) {
+              console.log(`❌ Failed to deploy to ${repo}: ${error.message}`);
+              throw error;
+            }
+
+  collect-reports:
+    name: Collect Compliance Reports
+    runs-on: ubuntu-latest
+    needs: [get-repositories, deploy-workflows]
+    if: always() && (github.event.inputs.action == 'collect-reports' || github.event.inputs.action == 'full-audit' || github.event_name == 'schedule')
+    strategy:
+      matrix:
+        repository: ${{ fromJson(needs.get-repositories.outputs.repositories) }}
+      max-parallel: 10
+      fail-fast: false
+    outputs:
+      compliance_data: ${{ steps.aggregate.outputs.data }}
+    steps:
+      - name: Collect repository compliance data
+        id: collect
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repo = '${{ matrix.repository }}';
+            console.log(`📊 Collecting compliance data for ${repo}...`);
+            
+            const complianceData = {
+              repository: repo,
+              timestamp: new Date().toISOString(),
+              governance_workflow: false,
+              data_classification: false,
+              recent_scans: [],
+              security_features: {},
+              compliance_score: 0
+            };
+            
+            try {
+              // Check workflows
+              const { data: workflows } = await github.rest.actions.listRepoWorkflows({
+                owner: process.env.ORG_NAME,
+                repo: repo
+              });
+              
+              complianceData.governance_workflow = workflows.workflows.some(w => 
+                w.name.includes('Governance') || w.name.includes('Compliance')
+              );
+              
+              // Check recent workflow runs
+              if (complianceData.governance_workflow) {
+                const governanceWorkflow = workflows.workflows.find(w => 
+                  w.name.includes('Governance')
+                );
+                
+                if (governanceWorkflow) {
+                  const { data: runs } = await github.rest.actions.listWorkflowRuns({
+                    owner: process.env.ORG_NAME,
+                    repo: repo,
+                    workflow_id: governanceWorkflow.id,
+                    per_page: 5
+                  });
+                  
+                  complianceData.recent_scans = runs.workflow_runs.map(run => ({
+                    date: run.created_at,
+                    status: run.conclusion,
+                    url: run.html_url
+                  }));
+                }
+              }
+              
+              // Check DATA_CLASSIFICATION.md
+              try {
+                await github.rest.repos.getContent({
+                  owner: process.env.ORG_NAME,
+                  repo: repo,
+                  path: 'DATA_CLASSIFICATION.md'
+                });
+                complianceData.data_classification = true;
+              } catch (e) {
+                // File doesn't exist
+              }
+              
+              // Check repository security features
+              const { data: repoData } = await github.rest.repos.get({
+                owner: process.env.ORG_NAME,
+                repo: repo
+              });
+              
+              complianceData.security_features = {
+                private: repoData.private,
+                vulnerability_alerts: repoData.vulnerability_alerts_enabled,
+                secret_scanning: repoData.security_and_analysis?.secret_scanning?.status === 'enabled',
+                dependency_graph: repoData.security_and_analysis?.dependency_graph?.status === 'enabled'
+              };
+              
+              // Calculate compliance score
+              let score = 0;
+              if (complianceData.governance_workflow) score += 25;
+              if (complianceData.data_classification) score += 25;
+              if (complianceData.security_features.vulnerability_alerts) score += 15;
+              if (complianceData.security_features.secret_scanning) score += 15;
+              if (complianceData.security_features.dependency_graph) score += 10;
+              if (complianceData.recent_scans.some(s => s.status === 'success')) score += 10;
+              
+              complianceData.compliance_score = score;
+              
+              console.log(`Repository ${repo} compliance score: ${score}/100`);
+              
+            } catch (error) {
+              console.log(`Error collecting data for ${repo}: ${error.message}`);
+            }
+            
+            // Store data as artifact
+            const fs = require('fs');
+            fs.writeFileSync(`${repo}-compliance.json`, JSON.stringify(complianceData, null, 2));
+            
+            return complianceData;
+
+      - name: Upload compliance data
+        uses: actions/upload-artifact@v3
+        with:
+          name: compliance-data-${{ matrix.repository }}
+          path: "*-compliance.json"
+
+  generate-report:
+    name: Generate Organization Compliance Report
+    runs-on: ubuntu-latest
+    needs: [get-repositories, collect-reports]
+    if: always() && needs.collect-reports.result != 'skipped'
+    steps:
+      - name: Download all compliance data
+        uses: actions/download-artifact@v3
+        with:
+          path: compliance-data
+
+      - name: Generate comprehensive report
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            console.log('📈 Generating organization compliance report...');
+            
+            // Collect all compliance data
+            const complianceData = [];
+            const dataDir = 'compliance-data';
+            
+            if (fs.existsSync(dataDir)) {
+              const artifacts = fs.readdirSync(dataDir);
+              for (const artifact of artifacts) {
+                const artifactPath = path.join(dataDir, artifact);
+                if (fs.statSync(artifactPath).isDirectory()) {
+                  const files = fs.readdirSync(artifactPath);
+                  for (const file of files) {
+                    if (file.endsWith('-compliance.json')) {
+                      const filePath = path.join(artifactPath, file);
+                      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                      complianceData.push(data);
+                    }
+                  }
+                }
+              }
+            }
+            
+            // Calculate organization-wide statistics
+            const totalRepos = complianceData.length;
+            const governanceEnabled = complianceData.filter(d => d.governance_workflow).length;
+            const classificationComplete = complianceData.filter(d => d.data_classification).length;
+            const avgComplianceScore = totalRepos > 0 ? 
+              complianceData.reduce((sum, d) => sum + d.compliance_score, 0) / totalRepos : 0;
+            
+            // Identify top compliance issues
+            const issueRepos = complianceData.filter(d => d.compliance_score < 70);
+            const criticalRepos = complianceData.filter(d => d.compliance_score < 40);
+            
+            // Generate report
+            const report = {
+              generated_at: new Date().toISOString(),
+              organization: process.env.ORG_NAME,
+              summary: {
+                total_repositories: totalRepos,
+                governance_enabled: governanceEnabled,
+                governance_percentage: Math.round((governanceEnabled / totalRepos) * 100),
+                classification_complete: classificationComplete,
+                classification_percentage: Math.round((classificationComplete / totalRepos) * 100),
+                average_compliance_score: Math.round(avgComplianceScore),
+                repositories_needing_attention: issueRepos.length,
+                critical_repositories: criticalRepos.length
+              },
+              top_issues: [
+                {
+                  issue: 'Missing governance workflow',
+                  affected_repos: complianceData.filter(d => !d.governance_workflow).length,
+                  repositories: complianceData.filter(d => !d.governance_workflow).map(d => d.repository)
+                },
+                {
+                  issue: 'Missing data classification',
+                  affected_repos: complianceData.filter(d => !d.data_classification).length,
+                  repositories: complianceData.filter(d => !d.data_classification).map(d => d.repository)
+                },
+                {
+                  issue: 'Low compliance score (<70)',
+                  affected_repos: issueRepos.length,
+                  repositories: issueRepos.map(d => d.repository)
+                }
+              ],
+              repository_details: complianceData.sort((a, b) => a.compliance_score - b.compliance_score)
+            };
+            
+            // Save comprehensive report
+            fs.writeFileSync('organization-compliance-report.json', JSON.stringify(report, null, 2));
+            
+            // Generate markdown summary
+            const markdown = `# 📊 Organization Compliance Report
+            
+## Summary
+- **Total Repositories**: ${totalRepos}
+- **Governance Enabled**: ${governanceEnabled}/${totalRepos} (${report.summary.governance_percentage}%)
+- **Data Classification Complete**: ${classificationComplete}/${totalRepos} (${report.summary.classification_percentage}%)
+- **Average Compliance Score**: ${report.summary.average_compliance_score}/100
+- **Repositories Needing Attention**: ${issueRepos.length}
+- **Critical Issues**: ${criticalRepos.length}
+
+## Top Compliance Issues
+
+${report.top_issues.map(issue => `
+### ${issue.issue}
+- **Affected Repositories**: ${issue.affected_repos}
+- **Repositories**: ${issue.repositories.slice(0, 10).join(', ')}${issue.repositories.length > 10 ? '...' : ''}
+`).join('')}
+
+## Action Items
+
+${criticalRepos.length > 0 ? `
+### Critical Priority
+${criticalRepos.map(repo => `- **${repo.repository}** (Score: ${repo.compliance_score}/100)`).join('\n')}
+` : ''}
+
+### Recommendations
+1. Deploy governance workflows to ${complianceData.filter(d => !d.governance_workflow).length} repositories
+2. Complete data classification for ${complianceData.filter(d => !d.data_classification).length} repositories
+3. Review security settings for repositories with low scores
+
+Generated on: ${new Date().toISOString()}
+            `;
+            
+            fs.writeFileSync('COMPLIANCE_REPORT.md', markdown);
+            
+            console.log('✅ Compliance report generated successfully');
+            console.log(`Organization compliance: ${report.summary.average_compliance_score}/100`);
+
+      - name: Upload compliance report
+        uses: actions/upload-artifact@v3
+        with:
+          name: organization-compliance-report
+          path: |
+            organization-compliance-report.json
+            COMPLIANCE_REPORT.md
+
+      - name: Post summary to GitHub
+        run: |
+          echo "# 📊 Organization Compliance Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cat COMPLIANCE_REPORT.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Create or update compliance issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('organization-compliance-report.json', 'utf8'));
+            const markdown = fs.readFileSync('COMPLIANCE_REPORT.md', 'utf8');
+            
+            // Check for existing compliance issue
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'compliance,automated'
+            });
+            
+            const title = `📊 Organization Compliance Report - ${new Date().toISOString().split('T')[0]}`;
+            
+            if (issues.length > 0) {
+              // Update existing issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues[0].number,
+                title: title,
+                body: markdown
+              });
+              console.log(`Updated existing compliance issue #${issues[0].number}`);
+            } else {
+              // Create new issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: markdown,
+                labels: ['compliance', 'automated', 'governance']
+              });
+              console.log('Created new compliance issue');
+            }

@@ -156,7 +156,7 @@ If you accidentally upload sensitive data:
 4. **Follow incident response procedures**
 
 **Emergency contacts:**
-- **GitHub Tech Managers**: [GitHub Tech Managers](contact.md)
+- **GitHub Tech Managers**: [GitHub Tech Managers](../help/contact.md)
 - **Administration/Billing**: [Administration team](../help/contact.md)  
 - **Response time**: 1-2 business days for technical issues
 
