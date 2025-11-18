@@ -267,10 +267,10 @@ After repository creation:
 
 ## Emergency Contacts
 
-- **Repository Issues**: `github-admin@organization.edu`
-- **Governance Questions**: `github-governance@organization.edu`
-- **Security Concerns**: `security@organization.edu`
-- **Technical Support**: `helpdesk@organization.edu`
+- **GitHub Tech Managers**: [GitHub Tech Managers](../help/contact.md)
+  - Repository issues, governance questions, security concerns, technical support
+- **Administration/Billing**: [Administration team](../help/contact.md)
+  - Account billing and organizational administration
 
 ---
 

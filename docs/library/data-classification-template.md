@@ -167,10 +167,10 @@ This classification must be reviewed:
 
 ## Emergency Contacts
 
-- **Data Protection Officer**: `email@organization.edu`
-- **Governance Team**: `github-governance@organization.edu`
-- **IT Security**: `security@organization.edu`
-- **Compliance Office**: `compliance@organization.edu`
+- **Data Protection Officer**: `email@ufl.edu`
+- **Governance Team**: [GitHub Tech Managers](../help/contact.md)
+- **IT Security**: [GitHub Tech Managers](../help/contact.md)
+- **Compliance Office**: `compliance@ufl.edu`
 
 ---
 

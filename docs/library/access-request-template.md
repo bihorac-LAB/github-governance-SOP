@@ -41,7 +41,7 @@ body:
     attributes:
       label: Institutional Email
       description: Your official organization email address
-      placeholder: "jane.smith@organization.edu"
+      placeholder: "jane.smith@ufl.edu"
     validations:
       required: true
 
@@ -73,7 +73,7 @@ body:
     attributes:
       label: Manager/PI/Supervisor
       description: Name and email of your direct supervisor who approved this request
-      placeholder: "Dr. John Doe (john.doe@organization.edu)"
+      placeholder: "Dr. John Doe (john.doe@ufl.edu)"
     validations:
       required: true
 

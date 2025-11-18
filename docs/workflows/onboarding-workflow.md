@@ -200,10 +200,10 @@ After completing onboarding:
 
 ## Emergency Contacts
 
-- **Technical Issues**: `github-support@organization.edu`
-- **Access Problems**: `github-admin@organization.edu`  
-- **Policy Questions**: `github-governance@organization.edu`
-- **General IT Help**: `helpdesk@organization.edu`
+- **Technical Issues**: [GitHub Tech Managers](../help/contact.md)
+- **Access Problems**: [GitHub Tech Managers](../help/contact.md)
+- **Policy Questions**: [GitHub Tech Managers](../help/contact.md)
+- **General IT Help**: `[Administration team](../help/contact.md)`
 
 ---
 

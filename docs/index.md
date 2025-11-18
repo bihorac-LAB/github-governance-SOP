@@ -1,41 +1,69 @@
-# GitHub Governance & Training Portal
+# GitHub Governance Guide
 
-Welcome to the internal **GitHub Governance & Training** documentation site.
+Welcome! This guide helps everyone in your organization use GitHub safely and effectively.
 
-This site is built with **MkDocs + Material theme** and is intended for:
+## 🎯 What This Guide Does
 
-- Technical staff (engineers, data scientists, developers)
-- Research staff (analysts, postdocs, students)
-- Clinical staff (physicians, nurses, clinical researchers)
-- Compliance, data governance, and leadership
+This guide teaches you:
 
-Use this site as the **single source of truth** for:
+- **How to use GitHub** in your organization
+- **Safety rules** to protect sensitive data
+- **Step-by-step instructions** for common tasks
+- **Who to contact** when you need help
 
-- GitHub usage and governance (SOP)
-- Training and onboarding
-- Data safety and classification
-- Repository creation and lifecycle
-- Automation via GitHub Actions (“robots”)
-- Routine reviews, audits, and incident response
+## 🚀 Start Here
+
+**New to GitHub or our organization?**
+
+1. **[Getting Started](getting-started/index.md)**  
+   Learn the basics and get access
+
+2. **[Basic Rules](rules/index.md)**  
+   Understand what you can and can't do
+
+3. **[How-To Guides](guides/create-repository.md)**  
+   Follow step-by-step instructions
+
+4. **[Templates](library/index.md)**  
+   Ready-to-use templates
+
+5. **[Get Help](help/index.md)**  
+   Find answers or contact support
+
+## 👥 Who This Guide Is For
+
+- **New employees** who need GitHub access
+- **Researchers** sharing code and data
+- **Developers** building applications  
+- **Administrators** managing the organization
+- **Anyone** who works with GitHub in our organization
+
+## 🔒 Safety First
+
+**Important**: This guide includes strict rules about data safety. Please read the [Data Safety](rules/data-safety.md) section carefully.
+
+**Never upload**:
+- Patient information (PHI)
+- Personal information (PII) 
+- Passwords or secret keys
+- Sensitive company data
+
+## 🎓 Quick Training Path
+
+**For busy people - minimum 15 minutes**:
+
+1. Read [What You Need to Know](rules/index.md) (5 min)
+2. Complete [Getting Started Quiz](getting-started/quiz.md) (5 min)
+3. Review [Data Safety Rules](rules/data-safety.md) (5 min)
+4. Request access using our [form](getting-started/request-access.md)
+
+## 📞 Need Help?
+
+- **Quick questions**: Check our [FAQ](help/faq.md)
+- **Technical problems**: See [Troubleshooting](help/troubleshooting.md)
+- **Contact information**: See [Contact Information](help/contact.md)
+- **Emergency**: See [Contact Information](help/contact.md) for procedures
 
 ---
 
-## Quick Start
-
-- 👉 **Read the SOP:** [GitHub Governance & Training Manual](sop/master_manual.md)
-- 👉 **New to GitHub?** See [GitHub Fundamentals](sop/master_manual.md#2-github-fundamentals-for-all-staff)
-- 👉 **Setting up your first repo?** See [Repository Governance](sop/master_manual.md#6-repository-governance)
-- 👉 **Curious about robots/automation?** See [Automation and “Robots”](sop/master_manual.md#9-automation-and-robots-github-actions)
-
----
-
-## How This Site Is Organized
-
-- **SOP** – The full master GitHub governance & training manual.
-- **Training** – Interactive session outlines, exercises, and flowcharts.
-- **Automation** – GitHub Actions (“robots”) documentation and examples.
-- **Workflows** – Step-by-step guides for onboarding, PR review, publication, audits, and incident response.
-- **Templates** – Reusable templates (README, PR, issue, policies).
-- **FAQ** – Common questions from clinicians and non-technical users.
-
-Use the navigation bar at the top (or left, depending on theme) to explore.
+**Ready to start?** Go to **[Getting Started](getting-started/index.md)** 👉
