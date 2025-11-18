@@ -1,16 +1,16 @@
-# Request Access via Pull Request
+# Request GitHub Access
 
-Instead of filling out forms, you'll request access by creating a **Pull Request** - this demonstrates your understanding of GitHub and gives you practical experience!
+You can request GitHub organization access by creating a simple **GitHub Issue** - it's quick, easy, and creates a clear record of your request.
 
-## 🎯 Why Pull Requests for Access?
+## 🎯 Why GitHub Issues?
 
-Using Pull Requests to request access:
+Using GitHub Issues for access requests:
 
-- ✅ **Demonstrates GitHub knowledge** - you prove you understand the basics
-- ✅ **Shows real learning** - not just filling out a form
-- ✅ **Creates a record** - transparent process with discussion
-- ✅ **Builds confidence** - you get practice before real work
-- ✅ **Community review** - team members can provide input
+- ✅ **Simple and quick** - just fill in a template, no forking required
+- ✅ **Easy to track** - clear status updates and discussion
+- ✅ **No technical barriers** - anyone can create an issue
+- ✅ **Efficient processing** - administrators can respond quickly
+- ✅ **Transparent process** - open communication and record-keeping
 
 ## 📋 Prerequisites
 
@@ -22,232 +22,144 @@ Before requesting access:
 - [ ] **Created GitHub account** with your institutional email
 - [ ] **Enabled 2FA** on your GitHub account
 
-## 🚀 Step-by-Step Process
+## 🚀 Simple 2-Step Process
 
-### Step 1: Fork This Repository
+### Step 1: Create an Access Request Issue
 
-1. **Go to the governance repository** (where you're reading this)
-2. **Click the "Fork" button** in the top-right corner
-3. **Create fork in your account** - this creates your own copy
+1. **Click this link**: [🎯 Create Access Request Issue →](https://github.com/bihorac-LAB/github-governance-SOP/issues/new?template=access-request.md&title=Access+Request+-+%5BYour+Name%5D)
+2. **Fill in the template** that appears automatically
+3. **Click "Submit new issue"** - that's it!
 
-### Step 2: Create Your Access Request File
+### Step 2: Wait for Response
 
-1. **Navigate to** `requests/access-requests/` folder in your fork
-2. **Create a new file** named `YYYY-MM-DD-your-username.md`
-   - Example: `2024-11-17-jane-smith.md`
-3. **Use this template**:
+- **Response time**: 1-3 business days
+- **You'll get email notifications** when administrators respond
+- **Status updates** will be posted directly in your issue
 
-```markdown
----
-title: "Access Request - [Your Full Name]"
-date: YYYY-MM-DD
-status: pending
 ---
 
-# GitHub Organization Access Request
+## 📝 What Information to Include
 
-## Personal Information
+When you create your issue, you'll need to provide:
 
-- **Full Name**: Your Full Name
-- **Email**: [your.email@ufl.edu]
-- **GitHub Username**: your-github-username
-- **Department/Role**: Your department and job title
-- **Supervisor**: Supervisor Name (supervisor.name@ufl.edu)
+### Personal Information
+- **Full Name** and **Department**
+- **Email** (institutional email required)
+- **GitHub Username** 
+- **Supervisor** name and email
 
-## Learning Verification
+### Learning Verification
+- [ ] Completed quiz with **80%+ score**
+- [ ] Read all required documentation sections
+- [ ] Understand data safety policies
+- [ ] Have supervisor approval (if required)
 
-- [ ] I have read the Getting Started guide
-- [ ] I have read the Basic Rules section  
-- [ ] I have read the Data Safety rules
-- [ ] I completed the quiz with score: __% (80% minimum)
-- [ ] I understand what data can and cannot be stored in GitHub
+### Access Justification
+- **What you plan to do** with GitHub access
+- **Specific repositories** you need (if known)
+- **Project or research context**
 
-## Access Justification
+### Technical Setup
+- [ ] **GitHub account** with institutional email
+- [ ] **Two-factor authentication (2FA)** enabled
+- [ ] **Profile** includes real name and affiliation
 
-**Intended Use**: 
-Describe what you plan to do with GitHub access. Examples:
-- Contributing to research project X
-- Collaborating on educational materials
-- Managing documentation for team Y
-
-**Specific Repositories** (if known):
-List any specific repositories you need access to
-
-**Expected Activity Level**:
-- [ ] Light use (occasional contributions)
-- [ ] Regular use (weekly contributions)  
-- [ ] Heavy use (daily work)
-
-## Role Request
-
-Based on my intended use, I request:
+### Role Requested
 - [ ] **Viewer** - Read and download access only
-- [ ] **Contributor** - Ability to suggest changes via pull requests  
+- [ ] **Contributor** - Suggest changes via pull requests  
 - [ ] **Maintainer** - Administrative access (requires additional approval)
 
-## Data Safety Acknowledgment
-
-I understand and agree to the following:
-
-- [ ] I will NEVER upload patient data (PHI) or personal information (PII)
-- [ ] I will NEVER store passwords, API keys, or credentials in GitHub
-- [ ] I will complete data classification before creating repositories
-- [ ] I will report any security incidents immediately
-- [ ] I understand my GitHub activity may be monitored for compliance
-
-## Technical Setup Confirmation
-
-- [ ] GitHub account created with institutional email
-- [ ] Two-factor authentication (2FA) enabled
-- [ ] Profile includes real name and institutional affiliation
-- [ ] Supervisor has been notified of this access request
-
-## Additional Information
-
-*Include any additional context, special requirements, or questions*
-
 ---
 
-## For Reviewers
+## 📋 Issue Template Preview
 
-**Manager Approval**: [ ] Pending [ ] Approved [ ] Denied  
-**Governance Review**: [ ] Pending [ ] Approved [ ] Denied  
-**Technical Setup**: [ ] Pending [ ] Complete  
+When you click the link above, you'll see a template like this:
 
-**Review Notes**:
-*Space for reviewer comments*
-```
+```markdown
+## Personal Information
+- **Full Name**: 
+- **Department**: 
+- **Email**: [institutional email]
+- **GitHub Username**: 
+- **Supervisor**: 
 
-### Step 3: Submit Pull Request
+## Learning Verification
+- [ ] Completed quiz with score: _%_ (80% minimum required)
+- [ ] Read Getting Started guide
+- [ ] Read Basic Rules and Data Safety policies
+- [ ] Have supervisor approval
 
-1. **Commit your new file** with message: "Request GitHub access for [Your Name]"
-2. **Create Pull Request** to the main repository
-3. **Title**: "Access Request: [Your Full Name]"
-4. **Description**: 
-```
-## Access Request Summary
+## Access Request
+**Intended use**: [Describe your planned GitHub activities]
+**Specific repositories**: [List any you know about]
+**Role requested**: [ ] Viewer [ ] Contributor [ ] Maintainer
 
-- **Name**: Your Name
-- **Role**: Your Role
-- **Quiz Score**: X%
-- **Supervisor Approval**: [Name]
-
-I have completed the required learning and request access to the GitHub organization. 
-This PR demonstrates my understanding of GitHub workflows and governance policies.
+## Acknowledgments
+- [ ] I will NEVER upload patient/personal data
+- [ ] I will NEVER store credentials in GitHub  
+- [ ] I will follow data classification policies
+- [ ] I understand my activity may be monitored
 ```
 
 ## 🔍 Review Process
 
 ### What Happens Next
 
-1. **Automated checks** verify your file format and completeness
-2. **Governance team reviews** your request and background  
-3. **Manager confirmation** - we may contact your supervisor
-4. **Community input** - team members can comment and provide feedback
-5. **Final approval** and account setup
+1. **Automated labeling** - Your issue gets categorized automatically
+2. **Initial review** - Tech managers review completeness within 1 business day
+3. **Supervisor confirmation** - We may verify approval with your manager
+4. **Background check** - Verify quiz completion and policy understanding  
+5. **Account setup** - GitHub invitation and role assignment
 
 ### Timeline
 
-- **Initial review**: 1-2 business days
-- **Complete approval**: 2-5 business days  
-- **Complex cases**: Up to 1 week
+- **Initial response**: Same or next business day
+- **Complete approval**: 1-3 business days  
+- **Complex cases**: Up to 1 week (with status updates)
 
 ### Approval Criteria
 
-Your request will be approved if:
-- ✅ **Complete information** provided
-- ✅ **Quiz passed** with 80%+ score
-- ✅ **Manager approval** confirmed
-- ✅ **Legitimate business need** demonstrated
-- ✅ **Technical setup** completed properly
-
-## 📝 PR Review Guidelines
-
-### What Reviewers Look For
-
-**Content Quality:**
-- All required fields completed
-- Clear justification for access
-- Appropriate role request
-- Proper acknowledgments
-
-**Technical Competence:**
-- Correct file format and naming
-- Proper markdown syntax
-- Understanding of PR process
-- GitHub account properly configured
-
-**Policy Understanding:**
-- Demonstrates data safety knowledge
-- Shows understanding of roles and responsibilities
-- Acknowledges compliance requirements
-
-### Common Feedback
-
-**Incomplete Requests:**
-- Missing supervisor approval
-- Incomplete quiz verification
-- Unclear intended use
-
-**Technical Issues:**
-- Incorrect file naming
-- Missing 2FA setup
-- Wrong repository location
-
-**Policy Concerns:**
-- Requesting inappropriate access level
-- Unclear data handling plans
-- Missing required acknowledgments
+✅ **Complete information** in your issue  
+✅ **Quiz passed** with 80%+ score  
+✅ **Supervisor approval** confirmed  
+✅ **Legitimate business need**  
+✅ **Proper technical setup** (2FA, institutional email)  
 
 ## 🎉 After Approval
 
-Once your PR is merged:
+Once approved:
 
-1. **GitHub invitation sent** to your email
-2. **Account configuration** completed
-3. **Team assignments** based on your role
-4. **Welcome package** with next steps
-5. **Orientation scheduling** (if applicable)
+1. **GitHub invitation** sent to your email
+2. **Role assignment** based on your request
+3. **Welcome comment** with next steps posted in your issue
+4. **Issue closed** with "approved" label
 
 ## ❓ Common Questions
 
-### "I'm not comfortable with Pull Requests yet"
+**"What if I need to update my request?"**  
+Just add a comment to your issue with additional information.
 
-That's the point! This process teaches you the basics in a safe environment. Don't worry - the community will help you if you make mistakes.
+**"Can I request access for my team?"**  
+No, each person must submit their own issue to demonstrate understanding.
 
-### "What if I mess up the PR?"
+**"What if my request is denied?"**  
+We'll explain why and what to fix. You can create a new issue once ready.
 
-No problem! We expect learning curves. Ask for help in the comments, and we'll guide you through any fixes needed.
-
-### "Can I request access for someone else?"
-
-No, each person must submit their own request to demonstrate individual understanding and commitment.
-
-### "What if my request is denied?"
-
-We'll provide specific feedback on what needs to be addressed. You can resubmit after completing additional requirements.
+**"I'm new to GitHub Issues - is this hard?"**  
+Not at all! It's like filling out a simple form. Much easier than pull requests.
 
 ## 🆘 Getting Help
 
-**PR Technical Issues:**
-- Comment in your PR for help
-- Contact: [GitHub Tech Managers](../help/contact.md)
-- Response time: 1-2 business days
+**Issue Problems:**
+- Tag `@github-tech-managers` in your issue
+- Email: [GitHub Tech Managers](../help/contact.md)
 
 **Policy Questions:**
+- Check our [FAQ](../help/faq.md)
 - Contact: [GitHub Tech Managers](../help/contact.md)
-- Review FAQ: [Frequently Asked Questions](../help/faq.md)
-
-**Manager Approval Issues:**
-- Work with your direct supervisor
-- CC GitHub Tech Managers if escalation needed
 
 ---
 
-**Ready to start?** 
+## 🚀 Ready to Request Access?
 
-1. **Fork this repository**
-2. **Create your request file**  
-3. **Submit your Pull Request**
-
-Good luck! 🚀
+**[🎯 Click Here to Create Your Access Request →](https://github.com/bihorac-LAB/github-governance-SOP/issues/new?template=access-request.md&title=Access+Request+-+%5BYour+Name%5D)**
