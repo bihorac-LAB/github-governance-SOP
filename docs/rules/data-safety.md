@@ -88,13 +88,13 @@ Before uploading anything to GitHub, follow this decision tree:
 
 ```mermaid
 flowchart TD
-    A[Do You Want to Store Something?] --> B{Is it real-world data<br/>(patients, staff, hospital)?}
-    B -->|Yes| C[❌ STOP: Use Secure, IRB-Approved Storage<br/>Not GitHub]
-    B -->|No| D{Is it synthetic or educational only?}
-    D -->|Yes| E[✅ GitHub Allowed<br/>Public or Private]
-    D -->|No| F{Does it contain secrets<br/>(keys, passwords, tokens)?}
-    F -->|Yes| G[❌ STOP: Use Secret Manager<br/>Not GitHub]
-    F -->|No| H[✅ Code / Docs Only<br/>GitHub Allowed<br/>Private Recommended]
+    A[Store something?] --> B{Real-world data?}
+    B -->|Yes| C[STOP: Use IRB storage]
+    B -->|No| D{Synthetic / demo?}
+    D -->|Yes| E[OK: GitHub allowed]
+    D -->|No| F{Contains secrets?}
+    F -->|Yes| G[STOP: Use secret manager]
+    F -->|No| H[OK: Code/docs only]
 ```
 
 !!! warning "When In Doubt"
