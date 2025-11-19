@@ -6,31 +6,20 @@ Ready-to-use templates to help you follow best practices in your GitHub reposito
 
 All templates are available in our **[Template Library](https://github.com/bihorac-LAB/github-governance-SOP/tree/main/templates)** on GitHub.
 
-### 📄 README Templates
+### 📄 README Template
 
-**[→ Basic Project README](https://github.com/bihorac-LAB/github-governance-SOP/blob/main/templates/readme-basic.md)**  
-For simple code projects and tools
-- Project description and purpose
-- Installation and usage instructions  
-- Contact information and data classification
-
-**[→ Research Project README](https://github.com/bihorac-LAB/github-governance-SOP/blob/main/templates/readme-research.md)**  
-For academic and research repositories
-- Research objectives and methodology
-- Data sources and limitations
-- Citation requirements and collaboration guidelines
-
-**[→ Publication Repository README](https://github.com/bihorac-LAB/github-governance-SOP/blob/main/templates/readme-publication.md)**  
-For published research with code/data
-- Paper reference and DOI links
-- Code and data availability statements
-- Reproduction instructions and licensing
+**[→ Universal README Template](https://github.com/bihorac-LAB/github-governance-SOP/blob/main/templates/README.template.md)**  
+One flexible template for all projects - customize as needed
+- Works for basic projects, research, and publications
+- Delete sections you don't need
+- Add your project-specific information
 
 ### 🔄 GitHub Templates
 
 **[→ Pull Request Templates](https://github.com/bihorac-LAB/github-governance-SOP/tree/main/templates/pull-requests)**  
 - Standard PR template for code/docs changes
 - Data-sensitive PR template with extra safety checks
+- Publication PR template for research outputs
 
 **[→ Issue Templates](https://github.com/bihorac-LAB/github-governance-SOP/tree/main/templates/issues)**  
 - Bug report template
@@ -72,14 +61,18 @@ Required for all repositories
 ### Quick Copy Commands
 
 ```bash
-# Copy a README template
-curl -o README.md https://raw.githubusercontent.com/bihorac-LAB/github-governance-SOP/main/templates/readme-basic.md
+# Copy README template
+curl -o README.md https://raw.githubusercontent.com/bihorac-LAB/github-governance-SOP/main/templates/README.template.md
 
-# Copy data classification template
+# Copy data classification template (REQUIRED)
 curl -o DATA_CLASSIFICATION.md https://raw.githubusercontent.com/bihorac-LAB/github-governance-SOP/main/templates/data-classification-template.md
 
 # Copy contributing guidelines
 curl -o CONTRIBUTING.md https://raw.githubusercontent.com/bihorac-LAB/github-governance-SOP/main/templates/CONTRIBUTING.md
+
+# Copy standard PR template
+mkdir -p .github
+curl -o .github/pull_request_template.md https://raw.githubusercontent.com/bihorac-LAB/github-governance-SOP/main/templates/pull-requests/standard-pr.md
 ```
 
 ## 💡 Need Help?
