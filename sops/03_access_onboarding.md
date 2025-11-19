@@ -22,7 +22,7 @@ Every new GitHub user must complete **all** of the following:
 - [ ] **GitHub account** created using institutional email (not personal).  
 - [ ] **Invitation accepted** to the organization’s GitHub.  
 - [ ] **Two-Factor Authentication (2FA)** enabled.  
-  - Guide: https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa  
+  - Guide: [Two-Factor Authentication Setup](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa)  
 - [ ] Read this **GitHub SOP**.  
 - [ ] Completed **basic GitHub training links** in Section 2.3.  
 - [ ] A **role** has been assigned (Viewer / Contributor / Maintainer).  

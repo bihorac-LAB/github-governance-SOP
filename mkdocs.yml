@@ -38,7 +38,7 @@ nav:
       - Make Changes (Pull Requests): guides/pull-requests.md
       - Collaborate Safely: guides/collaboration.md
   - 4. Templates & Downloads:
-      - Template Library: library/index.md
+      - Template Library: templates.md
   - 5. Help & Support:
       - Get Help: help/index.md
       - Troubleshooting: help/troubleshooting.md
@@ -77,6 +77,13 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
+  - javascripts/mermaid-init.js
+
+extra_css:
+  - stylesheets/extra.css
 
 extra:
   social:

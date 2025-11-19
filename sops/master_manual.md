@@ -122,26 +122,26 @@ This section helps **non-technical staff** understand GitHub and provides links 
 
 | Concept       | Simple Explanation                                        | Learn More |
 |--------------|------------------------------------------------------------|-----------|
-| Repository   | A “project folder” containing code, documents, etc.       | https://docs.github.com/en/repositories |
-| Commit       | A saved snapshot of changes with a message.               | https://www.atlassian.com/git/tutorials/what-is-version-control |
-| Branch       | A parallel copy of the code for safe experimentation.     | https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches |
-| Pull Request | A request to merge your changes into the main project.    | https://docs.github.com/en/pull-requests |
-| Issue        | A tracked task, bug, or feature request.                  | https://docs.github.com/en/issues |
-| Actions      | Automated workflows that run checks and tasks.            | https://docs.github.com/en/actions |
-| Markdown     | A simple way to format text on GitHub (headings, lists).  | https://www.markdownguide.org/basic-syntax/ |
+| Repository   | A "project folder" containing code, documents, etc.       | [Learn More](https://docs.github.com/en/repositories) |
+| Commit       | A saved snapshot of changes with a message.               | [Learn More](https://www.atlassian.com/git/tutorials/what-is-version-control) |
+| Branch       | A parallel copy of the code for safe experimentation.     | [Learn More](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches) |
+| Pull Request | A request to merge your changes into the main project.    | [Learn More](https://docs.github.com/en/pull-requests) |
+| Issue        | A tracked task, bug, or feature request.                  | [Learn More](https://docs.github.com/en/issues) |
+| Actions      | Automated workflows that run checks and tasks.            | [Learn More](https://docs.github.com/en/actions) |
+| Markdown     | A simple way to format text on GitHub (headings, lists).  | [Learn More](https://www.markdownguide.org/basic-syntax/) |
 
 ### 2.3 Beginner-Friendly Learning Path
 
 Recommended for new users:
 
-1. **Hello World on GitHub**  
-   https://docs.github.com/en/get-started/start-your-journey/hello-world  
-2. **Introduction to GitHub Repositories**  
-   https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories  
-3. **Working with Pull Requests**  
-   https://docs.github.com/en/pull-requests  
-4. **Markdown Basics**  
-   https://www.markdownguide.org/basic-syntax/  
+1. **[Hello World on GitHub](https://docs.github.com/en/get-started/start-your-journey/hello-world)**  
+   Start your GitHub journey with this interactive tutorial  
+2. **[Introduction to GitHub Repositories](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories)**  
+   Learn how to create and manage repositories  
+3. **[Working with Pull Requests](https://docs.github.com/en/pull-requests)**  
+   Master the pull request workflow  
+4. **[Markdown Basics](https://www.markdownguide.org/basic-syntax/)**  
+   Learn how to format text with Markdown  
 
 These links can be assigned as **pre-work** for the training session.
 
@@ -171,7 +171,7 @@ Every new GitHub user must complete **all** of the following:
 - [ ] **GitHub account** created using institutional email (not personal).  
 - [ ] **Invitation accepted** to the organization’s GitHub.  
 - [ ] **Two-Factor Authentication (2FA)** enabled.  
-  - Guide: https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa  
+  - Guide: [Two-Factor Authentication Setup](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa)  
 - [ ] Read this **GitHub SOP**.  
 - [ ] Completed **basic GitHub training links** in Section 2.3.  
 - [ ] A **role** has been assigned (Viewer / Contributor / Maintainer).  
@@ -646,12 +646,12 @@ If something goes wrong (e.g., sensitive data committed):
 
 A curated list of useful resources:
 
-- GitHub Learning Path for Beginners:  
-  https://docs.github.com/en/get-started/start-your-journey  
-- Git and GitHub Introduction:  
-  https://guides.github.com/introduction/git-handbook/  
-- Markdown Live Preview Playground (to practice formatting):  
-  https://www.markdownguide.org/tools/  
+- [GitHub Learning Path for Beginners](https://docs.github.com/en/get-started/start-your-journey) -  
+  Complete beginner's guide to using GitHub  
+- [Git and GitHub Introduction](https://guides.github.com/introduction/git-handbook/) -  
+  Essential Git concepts and GitHub workflow  
+- [Markdown Live Preview Playground](https://www.markdownguide.org/tools/) -  
+  Practice formatting with live preview  
 
 ---
 

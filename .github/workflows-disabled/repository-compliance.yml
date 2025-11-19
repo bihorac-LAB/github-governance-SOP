@@ -271,7 +271,7 @@ jobs:
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     title: '🛡️ Repository Security Configuration Review Needed',
-                    body: `## Security Configuration Issues\n\nThe automated security review found the following issues:\n\n${issues.map(i => `- ${i}`).join('\n')}\n\n### Recommended Actions\n\n1. Review and enable missing security features\n2. Configure branch protection rules\n3. Ensure compliance with organization security policies\n\n### Resources\n\n- [Security Guidelines](../docs/sop/10_security_compliance.md)\n- [Repository Setup Guide](../docs/workflows/repo-creation-workflow.md)\n\n---\n\n*This issue was created automatically by the compliance monitor. Please address these items and close this issue when complete.*`,
+                    body: `## Security Configuration Issues\n\nThe automated security review found the following issues:\n\n${issues.map(i => `- ${i}`).join('\n')}\n\n### Recommended Actions\n\n1. Review and enable missing security features\n2. Configure branch protection rules\n3. Ensure compliance with organization security policies\n\n### Resources\n\n- [Security Guidelines](../sops/10_security_compliance.md)\n- [Repository Setup Guide](../workflows/repo-creation-workflow.md)\n\n---\n\n*This issue was created automatically by the compliance monitor. Please address these items and close this issue when complete.*`,
                     labels: ['security', 'governance', 'automated']
                   });
                   console.log('📝 Created security review issue');

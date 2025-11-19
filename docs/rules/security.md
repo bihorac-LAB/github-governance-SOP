@@ -129,10 +129,10 @@ All users must follow these security rules to protect our organization and data.
 
 ## 📚 Additional Resources
 
-- **GitHub Security Guide**: https://docs.github.com/en/security
-- **Two-Factor Auth Setup**: https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa
-- **Git Security Best Practices**: [Internal link to be added]
-- **Incident Response Procedures**: [Internal link to be added]
+- **GitHub Security Guide**: [Official Security Documentation](https://docs.github.com/en/security)
+- **Two-Factor Auth Setup**: [Enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa)
+- **Git Security Best Practices**: [Security Checklist](../library/security-checklist.md)
+- **Incident Response Procedures**: [What to do in Security Incidents](../help/troubleshooting.md#security-incidents)
 
 ---
 

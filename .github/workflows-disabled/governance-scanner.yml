@@ -286,8 +286,8 @@ jobs:
           
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📚 Resources" >> $GITHUB_STEP_SUMMARY
-          echo "- [Data Classification Guidelines](../docs/sop/05_data_policy.md)" >> $GITHUB_STEP_SUMMARY
-          echo "- [Security Policies](../docs/sop/10_security_compliance.md)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Data Classification Guidelines](../sops/05_data_policy.md)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Security Policies](../sops/10_security_compliance.md)" >> $GITHUB_STEP_SUMMARY
           echo "- [Repository Templates](../docs/templates/index.md)" >> $GITHUB_STEP_SUMMARY
           
           # Fail the workflow if any critical checks failed
