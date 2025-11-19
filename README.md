@@ -1,6 +1,7 @@
 # GitHub Governance Guide
 
 Professional GitHub governance and onboarding workflow for organizations. This repository contains a comprehensive MkDocs-based guide covering policies, training, templates, and automated workflows.
+[![Deploy GitHub Governance Site](https://github.com/bihorac-LAB/github-governance-SOP/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/bihorac-LAB/github-governance-SOP/actions/workflows/deploy-docs.yml)
 
 ## 📚 Structure
 
